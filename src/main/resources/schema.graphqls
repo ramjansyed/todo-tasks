@@ -1,0 +1,36 @@
+type Todo {
+    id: ID!
+    title: String!
+    description: String
+    subtasks: [SubTask]
+}
+
+type SubTask {
+    id: ID!
+    title: String!
+    description: String
+    todo_id: ID
+}
+
+type Query {
+    todos: [Todo]
+    todo(id: ID!): Todo
+    subtasks: [SubTask]
+    subtaskbytodoid(todo_id: ID!): [SubTask]
+    subtaskbyid(id: ID!): SubTask
+}
+
+input SubTaskInput {
+    title: String!
+    description: String
+}
+
+type Mutation {
+    createToDo(title: String!, description: String, subTasks: [SubTaskInput]): Todo
+    updateToDo(id: ID!, title: String, description: String): Todo
+    deleteToDo(id: ID!): Boolean
+
+    createSubTask(todoId: ID!, title: String!, description: String): SubTask
+    updateSubTask(id: ID!, title: String, description: String): SubTask
+    deleteSubTask(id: ID!): Boolean
+}

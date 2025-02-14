@@ -1,0 +1,112 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'com.github.johnrengelman.shadow' version '8.1.0'  // Create fat JAR
+    id 'com.diffplug.spotless' version '6.25.0'  // Code formatting
+}
+
+group = 'com.todo'
+version = '1.0-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Dropwizard Core & Jetty
+    implementation 'io.dropwizard:dropwizard-core:3.0.9'
+    implementation 'io.dropwizard:dropwizard-jetty:3.0.9'
+
+    // Hibernate Validator (Jakarta EE compatible)
+    implementation 'org.hibernate.validator:hibernate-validator:6.2.5.Final'
+    implementation 'javax.validation:validation-api:2.0.1.Final'
+    implementation 'org.glassfish:javax.el:3.0.1-b12'  // EL for validation
+
+    // GraphQL
+    implementation 'com.graphql-java-kickstart:graphql-java-servlet:13.0.0'
+    implementation 'com.graphql-java-kickstart:graphql-java-tools:14.0.0'
+    implementation 'com.graphql-java:graphql-java-extended-validation:22.0'
+
+    // Hibernate ORM & H2 for in-memory DB
+    implementation 'org.hibernate:hibernate-core:6.3.1.Final'
+    implementation 'com.h2database:h2:2.3.232'
+
+    // GraphiQL UI (WebJar support)
+    implementation 'org.webjars:graphiql:0.11.11'
+    implementation 'org.webjars:webjars-locator-core:0.44'
+
+    // Lombok (Auto-generate Getters/Setters)
+    implementation 'org.projectlombok:lombok:1.18.36'
+    annotationProcessor 'org.projectlombok:lombok:1.18.36'
+
+    // Logging (Logback for Dropwizard 3.x)
+    implementation 'ch.qos.logback:logback-classic:1.4.14'
+
+    // JAX-RS (For REST APIs in Dropwizard)
+    implementation 'javax.ws.rs:javax.ws.rs-api:2.1.1'
+
+    // SQLite JDBC driver & Dropwizard JDBI
+    implementation 'org.xerial:sqlite-jdbc:3.41.2.1'
+    implementation 'io.dropwizard:dropwizard-jdbi3:3.0.9'
+
+    // Testing (JUnit 5 & Mockito)
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.mockito:mockito-core:5.2.0'
+}
+
+// Dependency resolution strategy (Force specific versions)
+configurations.configureEach {
+    resolutionStrategy {
+        force 'org.hibernate.validator:hibernate-validator:6.2.0.Final'
+        force 'com.graphql-java:graphql-java:21.5'
+    }
+}
+
+// Application Main Class
+application {
+    mainClass = 'com.todo.ToDoApplication'
+}
+
+// Ensure UTF-8 encoding
+tasks.withType(JavaExec).configureEach {
+    jvmArgs = ['-Dfile.encoding=UTF-8']
+}
+
+// Create standard JAR
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'com.todo.ToDoApplication'
+        )
+    }
+}
+
+// Create Fat JAR using Shadow Plugin
+shadowJar {
+    mergeServiceFiles()  // Merge service files like META-INF/services
+    archiveClassifier.set('all')  // Naming the fat JAR with '-all' suffix
+    manifest {
+        attributes(
+                'Main-Class': 'com.todo.ToDoApplication'
+        )
+    }
+}
+
+//  Code Formatting with Spotless
+//spotless {
+//    java {
+//        target 'src/**/*.java'
+//        importOrder 'java', 'javax', 'org', 'com'
+//        removeUnusedImports()
+//        googleJavaFormat()  // Apply Google's Java formatting style
+//        trimTrailingWhitespace()
+//        endWithNewline()
+//    }
+//}
