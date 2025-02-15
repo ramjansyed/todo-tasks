@@ -3,6 +3,7 @@ plugins {
     id 'application'
     id 'com.github.johnrengelman.shadow' version '8.1.0'  // Create fat JAR
     id 'com.diffplug.spotless' version '6.25.0'  // Code formatting
+    id 'org.sonarqube' version '6.0.1.5171'
 }
 
 group = 'com.todo'
@@ -59,45 +60,45 @@ dependencies {
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testImplementation 'org.mockito:mockito-core:5.2.0'
-}
+
 
 // Dependency resolution strategy (Force specific versions)
-configurations.configureEach {
-    resolutionStrategy {
-        force 'org.hibernate.validator:hibernate-validator:6.2.0.Final'
-        force 'com.graphql-java:graphql-java:21.5'
+    configurations.configureEach {
+        resolutionStrategy {
+            force 'org.hibernate.validator:hibernate-validator:6.2.0.Final'
+            force 'com.graphql-java:graphql-java:21.5'
+        }
     }
-}
 
 // Application Main Class
-application {
-    mainClass = 'com.todo.ToDoApplication'
-}
+    application {
+        mainClass = 'com.todo.ToDoApplication'
+    }
 
 // Ensure UTF-8 encoding
-tasks.withType(JavaExec).configureEach {
-    jvmArgs = ['-Dfile.encoding=UTF-8']
-}
+    tasks.withType(JavaExec).configureEach {
+        jvmArgs = ['-Dfile.encoding=UTF-8']
+    }
 
 // Create standard JAR
-jar {
-    manifest {
-        attributes(
-                'Main-Class': 'com.todo.ToDoApplication'
-        )
+    jar {
+        manifest {
+            attributes(
+                    'Main-Class': 'com.todo.ToDoApplication'
+            )
+        }
     }
-}
 
 // Create Fat JAR using Shadow Plugin
-shadowJar {
-    mergeServiceFiles()  // Merge service files like META-INF/services
-    archiveClassifier.set('all')  // Naming the fat JAR with '-all' suffix
-    manifest {
-        attributes(
-                'Main-Class': 'com.todo.ToDoApplication'
-        )
+    shadowJar {
+        mergeServiceFiles()  // Merge service files like META-INF/services
+        archiveClassifier.set('all')  // Naming the fat JAR with '-all' suffix
+        manifest {
+            attributes(
+                    'Main-Class': 'com.todo.ToDoApplication'
+            )
+        }
     }
-}
 
 //  Code Formatting with Spotless
 //spotless {
@@ -110,3 +111,21 @@ shadowJar {
 //        endWithNewline()
 //    }
 //}
+
+// SonarQube Properties
+//sonarqube {
+//    properties {
+//        property "sonar.host.url", "http://localhost:9000"
+//        property "sonar.login", ""
+//    }
+//}
+
+    sonar {
+        properties {
+            property "sonar.projectKey", "ramjansyed_todo-tasks"
+            property "sonar.organization", "ramjansyed"
+            property "sonar.host.url", "https://sonarcloud.io"
+        }
+    }
+
+}
