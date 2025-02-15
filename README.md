@@ -82,40 +82,50 @@ You can use the interactive GraphiQL interface to write and execute GraphQL quer
 
 **Example Query in GraphiQL UI**
 
-    query {
-        todo(id: "ec047081-e2d0-41fd-abcc-019412a6733c") {
-            id
-            title
-            description
-            subtasks {
+
+    mutation {
+        createToDo(
+            title: "Plan Project"
+            description: "Define tasks and milestones"
+            subTasks: [
+                { title: "Research GraphQL", description: "test" }
+                { title: "Set up Dropwizard", description: "test" }
+                ]
+            ) {
                 id
                 title
                 description
-                todo_id
+                subtasks {
+                    id
+                    title
+                    todo_id
+                }
             }
         }
-    }
 
 **Sample Response**
 
-    {
-        "data": {
-            "todo": {
-                "id": "ec047081-e2d0-41fd-abcc-019412a6733c",
-                "title": "Learn Dropwizard",
-                "description": "Build a GraphQL API",
-                    "subtasks": [
+        {
+            "data": {
+                "createToDo": {
+                    "id": "42807759-c113-4ebc-8d4f-59d8b4e77008",
+                    "title": "Plan Project",
+                    "description": "Define tasks and milestones",
+                        "subtasks": [
                         {
-                        "id": "7b3b7704-6381-4a55-ba7c-b79e1c674ea4",
-                        "title": "Write Docs",
-                        "description": "Update API documentation",
-                        "todo_id": "ec047081-e2d0-41fd-abcc-019412a6733c"
+                            "id": "3fb33684-76a7-42a9-bf5d-39d7359a1719",
+                            "title": "Research GraphQL",
+                            "todo_id": "42807759-c113-4ebc-8d4f-59d8b4e77008"
+                        },
+                        {
+                            "id": "567e8984-64fc-42ba-bc0e-350a2b57af11",
+                            "title": "Set up Dropwizard",
+                            "todo_id": "42807759-c113-4ebc-8d4f-59d8b4e77008"
                         }
                     ]
                 }
             }
-    }
-
+        }
 ## Project Structure
 * src/main/java/com/todo
     * Contains the Java source code for the Dropwizard application.
