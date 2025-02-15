@@ -132,35 +132,3 @@ You can use the interactive GraphiQL interface to write and execute GraphQL quer
 * src/main/resources:
     * Contains configuration files for Dropwizard.
 * build.gradle: The Gradle build file, where dependencies and configurations are defined.
-
-
-    ToDoApp/
-        ├── src/
-        │   ├── main/
-        │   │   ├── java/com/todo/
-        │   │   │   ├── ToDoApplication.java
-        │   │   │   ├── configuration/
-        │   │   │   │   ├── ToDoConfiguration.java
-        │   │   │   ├── health/
-        │   │   │   │   ├── ToDoHealthCheck.java
-        │   │   │   ├── repository/
-        │   │   │   │   ├── ToDoRepository.java
-        │   │   │   ├── resolvers/
-        │   │   │   │   ├── ToDoQueryResolver.java
-        │   │   │   │   ├── ToDoMutationResolver.java
-        │   │   │   ├── resources/
-        │   │   │   │   ├── ToDoResource.java
-        │   │   │   ├── models/
-        │   │   │   │   ├── ToDo.java
-        │   │   │   │   ├── SubTask.java
-        │   │   ├── resources/
-        │   │   │   ├── schema.graphqls
-        │   │   │   ├── config.yml
-        ├── build.gradle
-        ├── gradlew
-        ├── gradlew.bat
-        ├── settings.gradle
-        ├── README.md
-
-
-
