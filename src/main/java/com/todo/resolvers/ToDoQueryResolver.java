@@ -23,15 +23,17 @@ public class ToDoQueryResolver implements GraphQLQueryResolver {
     return repository.getToDoById(id);
   }
 
-  // Fetches the list of all To-Do objects
+  // Fetches the list of all SubTask objects
   public List<SubTask> subtasks() {
     return repository.getAllSubTasks();
   }
 
+  // Fetches the list of all SubTask for particular todo
   public List<SubTask> subtaskbytodoid(String todoId) {
     return repository.getSubTasksByToDoId(todoId);
   }
 
+  // Fetches a subtask by id
   public SubTask subtaskbyid(String id) {
     return repository.getSubTaskById(id);
   }
