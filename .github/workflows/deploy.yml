@@ -34,7 +34,7 @@ jobs:
       - name: Build and Tag Docker image
         run: |
           docker build -t todo-tasks-server:$GITHUB_SHA .
-          docker tag myapps:$GITHUB_SHA ramjansyed/myapps:$GITHUB_SHA
+          docker tag todo-tasks-server:$GITHUB_SHA ramjansyed/myapps:$GITHUB_SHA
 
       - name: Push Docker image to Docker Hub
         run: |
