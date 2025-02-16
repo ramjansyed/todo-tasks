@@ -28,11 +28,11 @@ public class ToDoQueryResolver implements GraphQLQueryResolver {
     return repository.getAllSubTasks();
   }
 
-  public List<SubTask> subtaskbytodoid(String todoId){
+  public List<SubTask> subtaskbytodoid(String todoId) {
     return repository.getSubTasksByToDoId(todoId);
   }
 
-  public SubTask subtaskbyid(String id){
+  public SubTask subtaskbyid(String id) {
     return repository.getSubTaskById(id);
   }
 }

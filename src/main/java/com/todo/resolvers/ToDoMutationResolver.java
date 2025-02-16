@@ -5,19 +5,18 @@ import com.todo.models.SubTaskInput;
 import com.todo.models.ToDo;
 import com.todo.repository.ToDoRepository;
 import graphql.kickstart.tools.GraphQLMutationResolver;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
-
-import java.util.List;
 
 @AllArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class ToDoMutationResolver implements GraphQLMutationResolver {
   ToDoRepository repository;
 
-  public ToDo createToDo(String title, String description,  List<SubTaskInput> subTaskInputList) {
-    return repository.createToDo(title, description,subTaskInputList);
+  public ToDo createToDo(String title, String description, List<SubTaskInput> subTaskInputList) {
+    return repository.createToDo(title, description, subTaskInputList);
   }
 
   public ToDo updateToDo(String id, String title, String description) {

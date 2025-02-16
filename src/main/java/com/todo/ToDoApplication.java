@@ -1,12 +1,12 @@
 package com.todo;
 
 import com.todo.configuration.ToDoConfiguration;
+import com.todo.exceptions.CustomGraphQLErrorHandler;
 import com.todo.metrics.ToDoHealthCheck;
 import com.todo.repository.ToDoRepository;
 import com.todo.resolvers.ToDoMutationResolver;
 import com.todo.resolvers.ToDoQueryResolver;
 import com.todo.resources.GraphiQLResource;
-import com.todo.exceptions.CustomGraphQLErrorHandler;
 import graphql.kickstart.servlet.GraphQLHttpServlet;
 import graphql.kickstart.tools.SchemaParser;
 import graphql.schema.GraphQLSchema;

@@ -101,16 +101,16 @@ dependencies {
     }
 
 //  Code Formatting with Spotless
-//spotless {
-//    java {
-//        target 'src/**/*.java'
-//        importOrder 'java', 'javax', 'org', 'com'
-//        removeUnusedImports()
-//        googleJavaFormat()  // Apply Google's Java formatting style
-//        trimTrailingWhitespace()
-//        endWithNewline()
-//    }
-//}
+spotless {
+    java {
+        target 'src/**/*.java'
+        importOrder 'java', 'javax', 'org', 'com'
+        removeUnusedImports()
+        googleJavaFormat()  // Apply Google's Java formatting style
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+}
 
 // SonarQube Properties
 //sonarqube {

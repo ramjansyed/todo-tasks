@@ -12,6 +12,6 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 public class SubTaskInput {
 
-    String title;
-    String description;
+  String title;
+  String description;
 }
