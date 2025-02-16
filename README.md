@@ -1,8 +1,6 @@
 # About this Project
-This project is a simple ToDo App which facilitates the below actions for both ToDo and SubTasks.
-* Create 
-* Update 
-* Delete
+This project is a simple ToDo App which facilitates the CRUD operations for both ToDo and SubTasks.
+
 ## Dropwizard GraphQL API with GraphiQL UI
 
 This project demonstrates how to set up a GraphQL API in a Java Dropwizard application with a GraphiQL user interface for testing queries.
@@ -40,7 +38,7 @@ This project demonstrates how to set up a GraphQL API in a Java Dropwizard appli
 ## Dependencies
 This project uses the following key dependencies:
 
-* Dropwizard: Framework for building RESTful web services.
+* Dropwizard: Framework for building GraphQL Application
 
 * GraphQL Java: Library to implement GraphQL in Java.
 
