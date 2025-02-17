@@ -35,7 +35,7 @@ jobs:
      - name: Push Docker Image to AWS ECR
        run: |
          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/todo-app
-#
-#      - name: Update ECS Service
-#        run: |
-#          aws ecs update-service --cluster todoDevCluster--service todo-service --force-new-deployment
+
+     - name: Update ECS Service
+       run: |
+         aws ecs update-service --cluster todoDevCluster--service todo-service --force-new-deployment
