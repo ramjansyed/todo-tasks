@@ -20,7 +20,7 @@ FROM openjdk:17-jdk-slim
 WORKDIR /app
 
 # Copy the compiled JAR file from the build stage
-COPY --from=build /app/build/libs/*.jar /app/app.jar
+COPY --from=build /app/build/libs/ToDoApp-1.0-SNAPSHOT-all.jar*.jar /app/app.jar
 
 # Copy the config.yml file from resource folder
 COPY src/main/resources/config.yml /app/config.yml
