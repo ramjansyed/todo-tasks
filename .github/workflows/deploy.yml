@@ -29,8 +29,8 @@ jobs:
 
      - name: Build & Tag Docker Image
        run: |
-         docker build -t todo-tasks .
-         docker tag todo-tasks-server:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/todo-app
+         docker build -t todo-app .
+         docker tag todo-app:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/todo-app:latest
 
      - name: Push Docker Image to AWS ECR
        run: |
