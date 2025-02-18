@@ -6,25 +6,19 @@ import com.todo.metrics.ToDoHealthCheck;
 import com.todo.repository.ToDoRepository;
 import com.todo.resolvers.ToDoMutationResolver;
 import com.todo.resolvers.ToDoQueryResolver;
+import com.todo.resources.GraphQLResource;
 import com.todo.resources.GraphiQLResource;
-import graphql.kickstart.servlet.GraphQLHttpServlet;
+import graphql.GraphQL;
 import graphql.kickstart.tools.SchemaParser;
 import graphql.schema.GraphQLSchema;
 import io.dropwizard.core.Application;
-import io.dropwizard.core.setup.Bootstrap;
 import io.dropwizard.core.setup.Environment;
-import javax.servlet.ServletRegistration;
 import org.jdbi.v3.core.Jdbi;
 
 public class ToDoApplication extends Application<ToDoConfiguration> {
 
   public static void main(String[] args) throws Exception {
     new ToDoApplication().run(args);
-  }
-
-  @Override
-  public void initialize(Bootstrap<ToDoConfiguration> bootstrap) {
-    // Any additional initialization if needed
   }
 
   @Override
@@ -45,14 +39,12 @@ public class ToDoApplication extends Application<ToDoConfiguration> {
             .build()
             .makeExecutableSchema();
 
-    // Register GraphQL servlet
-    ServletRegistration.Dynamic graphQLServlet =
-        environment.servlets().addServlet("GraphQLServlet", GraphQLHttpServlet.with(schema));
-    graphQLServlet.addMapping("/graphql");
-
-    //  environment.jersey().register(new ToDoResource()); // Register Resource for REST API
-    // endpoints
+    // Create GraphQL instance
+    GraphQL graphQL = GraphQL.newGraphQL(schema).build();
     final ToDoHealthCheck toDoHealthCheck = new ToDoHealthCheck();
+
+    // Register GraphQL Resources
+    environment.jersey().register(new GraphQLResource(graphQL));
     environment.healthChecks().register("healthCheck", toDoHealthCheck);
     environment.jersey().register(new GraphiQLResource()); // Register GraphiQL
     environment.jersey().register(new CustomGraphQLErrorHandler()); // Register ErrorHandler

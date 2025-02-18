@@ -5,34 +5,36 @@ import com.todo.models.SubTaskInput;
 import com.todo.models.ToDo;
 import com.todo.repository.ToDoRepository;
 import graphql.kickstart.tools.GraphQLMutationResolver;
-import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
+
+import java.util.List;
 
 @AllArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class ToDoMutationResolver implements GraphQLMutationResolver {
   ToDoRepository repository;
 
-  public ToDo createToDo(String title, String description, List<SubTaskInput> subTaskInputList) {
-    return repository.createToDo(title, description, subTaskInputList);
+  public ToDo createToDo(
+      String title, String description, Boolean completed, List<SubTaskInput> subTaskInputList) {
+    return repository.createToDo(title, description, completed, subTaskInputList);
   }
 
-  public ToDo updateToDo(String id, String title, String description) {
-    return repository.updateToDo(id, title, description);
+  public ToDo updateToDo(String id, String title, String description, Boolean completed) {
+    return repository.updateToDo(id, title, description, completed);
   }
 
   public boolean deleteToDo(String id) {
     return repository.deleteToDo(id);
   }
 
-  public SubTask createSubTask(String ToDoId, String title, String description) {
-    return repository.createSubTask(ToDoId, title, description);
+  public SubTask createSubTask(String ToDoId, String title, String description, Boolean completed) {
+    return repository.createSubTask(ToDoId, title, description, completed);
   }
 
-  public SubTask updateSubTask(String id, String title, String description) {
-    return repository.updateSubTask(id, title, description);
+  public SubTask updateSubTask(String id, String title, String description, Boolean completed) {
+    return repository.updateSubTask(id, title, description, completed);
   }
 
   public boolean deleteSubTask(String id) {

@@ -5,12 +5,13 @@ import com.todo.exceptions.TodoNotFoundException;
 import com.todo.models.SubTask;
 import com.todo.models.SubTaskInput;
 import com.todo.models.ToDo;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 public class ToDoRepository {
@@ -28,13 +29,15 @@ public class ToDoRepository {
           "CREATE TABLE IF NOT EXISTS todo ("
               + "id TEXT PRIMARY KEY, "
               + "title TEXT NOT NULL, "
-              + "description TEXT)");
+              + "description TEXT, "
+              + "completed BOOLEAN)");
 
       handle.execute(
           "CREATE TABLE IF NOT EXISTS subtask ("
               + "id TEXT PRIMARY KEY, "
               + "title TEXT, "
               + "description TEXT, "
+              + "completed BOOLEAN, "
               + "todo_id TEXT NOT NULL, "
               + "FOREIGN KEY(todo_id) REFERENCES todo(id) ON DELETE CASCADE)");
       log.info("Database setup completed.");
@@ -55,8 +58,8 @@ public class ToDoRepository {
                             rs.getString("id"),
                             rs.getString("title"),
                             rs.getString("description"),
-                            getSubTasksByToDoId(rs.getString("id")) // Fetch subtasks for each To-Do
-                            ))
+                            rs.getBoolean("completed"),
+                            getSubTasksByToDoId(rs.getString("id"))))
                 .list());
   }
 
@@ -76,14 +79,14 @@ public class ToDoRepository {
                             rs.getString("id"),
                             rs.getString("title"),
                             rs.getString("description"),
-                            getSubTasksByToDoId(rs.getString("id")) // Fetch subtasks for this ToDo
-                            ))
-                .findOne() // Ensures only one result is returned
+                            rs.getBoolean("completed"),
+                            getSubTasksByToDoId(rs.getString("id"))))
+                .findOne()
                 .orElseThrow(() -> new TodoNotFoundException("Todo with ID " + id + " not found")));
   }
 
-  public ToDo createToDo(String title, String description, List<SubTaskInput> subTaskInputList) {
-
+  public ToDo createToDo(
+      String title, String description, Boolean completed, List<SubTaskInput> subTaskInputList) {
     if (title == null || title.isBlank()) {
       throw new InvalidInputException("title is empty or null");
     }
@@ -91,10 +94,12 @@ public class ToDoRepository {
     jdbi.withHandle(
         handle ->
             handle
-                .createUpdate("INSERT INTO todo (id, title, description) VALUES (?, ?, ?)")
+                .createUpdate(
+                    "INSERT INTO todo (id, title, description, completed) VALUES (?, ?, ?, ?)")
                 .bind(0, id)
                 .bind(1, title)
                 .bind(2, description)
+                .bind(3, completed != null ? completed : false)
                 .execute());
 
     List<SubTask> createdSubTasks = new ArrayList<>();
@@ -108,54 +113,54 @@ public class ToDoRepository {
 
     log.info("Created todo with ID: {}", id);
 
-    return new ToDo(id, title, description, createdSubTasks);
+    return new ToDo(id, title, description, completed != null ? completed : false, createdSubTasks);
   }
 
-  public ToDo updateToDo(String id, String title, String description) {
-    log.info("Updated todo with ID: {}", id);
+  public ToDo updateToDo(String id, String title, String description, Boolean completed) {
 
-    if (title == null || title.isBlank() || id == null || id.isBlank()) {
-      throw new InvalidInputException("id or title or both empty or null");
+    if (id == null || id.isBlank()) {
+      throw new InvalidInputException("id is empty or null");
     }
+
+    log.info("Updating todo with ID: {}", id);
+
     jdbi.withHandle(
-        handle ->
-            handle
-                .createUpdate("UPDATE todo SET title = ?, description = ? WHERE id = ?")
-                .bind(0, title)
-                .bind(1, description)
-                .bind(2, id)
-                .execute());
-    return new ToDo(id, title, description, getSubTasksByToDoId(id)); // Return updated ToDo
+            handle ->
+                    handle
+                            .createUpdate(
+                                    "UPDATE todo SET title = ?, description = ?, completed = ? WHERE id = ?")
+                            .bind(0, title)
+                            .bind(1, description)
+                            .bind(2, completed)
+                            .bind(3, id)
+                            .execute());
+    return new ToDo(id, title, description, completed, getSubTasksByToDoId(id));
   }
 
   public boolean deleteToDo(String id) {
-
     log.info("Deleting todo with ID: {}", id);
 
     if (id == null || id.isBlank()) {
       throw new InvalidInputException("id is empty or null");
     }
     return jdbi.withHandle(
-        handle ->
-            handle.createUpdate("DELETE FROM todo WHERE id = ?").bind(0, id).execute()
-                > 0 // Returns true if at least 1 row was deleted
-        );
+            handle -> handle.createUpdate("DELETE FROM todo WHERE id = ?").bind(0, id).execute() > 0);
   }
 
   public List<SubTask> getAllSubTasks() {
-    log.info("Fetching all subtasks from the database.");
     return jdbi.withHandle(
-        handle ->
-            handle
-                .createQuery("SELECT * FROM subtask")
-                .map(
-                    (rs, ctx) ->
-                        new SubTask(
-                            rs.getString("id"),
-                            rs.getString("title"),
-                            rs.getString("description"),
-                            rs.getString("todo_id")))
-                .list());
+            handle ->
+                    handle
+                            .createQuery("SELECT * FROM subtask" )
+                            .map(
+                                    (rs, ctx) ->
+                                            new SubTask(
+                                                    rs.getString("id"),
+                                                    rs.getString("title"),
+                                                    rs.getString("description"),
+                                                    rs.getBoolean("completed"),
+                                                    rs.getString("todo_id")))
+                            .list());
   }
 
   public List<SubTask> getSubTasksByToDoId(String todoId) {
@@ -165,18 +170,19 @@ public class ToDoRepository {
       throw new InvalidInputException("todoId is empty or null");
     }
     return jdbi.withHandle(
-        handle ->
-            handle
-                .createQuery("SELECT * FROM subtask WHERE todo_id = ?")
-                .bind(0, todoId)
-                .map(
-                    (rs, ctx) ->
-                        new SubTask(
-                            rs.getString("id"),
-                            rs.getString("title"),
-                            rs.getString("description"),
-                            todoId))
-                .list());
+            handle ->
+                    handle
+                            .createQuery("SELECT * FROM subtask WHERE todo_id = ?")
+                            .bind(0, todoId)
+                            .map(
+                                    (rs, ctx) ->
+                                            new SubTask(
+                                                    rs.getString("id"),
+                                                    rs.getString("title"),
+                                                    rs.getString("description"),
+                                                    rs.getBoolean("completed"),
+                                                    todoId))
+                            .list());
   }
 
   public SubTask getSubTaskById(String id) {
@@ -186,73 +192,71 @@ public class ToDoRepository {
       throw new InvalidInputException("todoId is empty or null");
     }
     return jdbi.withHandle(
-        handle ->
-            handle
-                .createQuery("SELECT * FROM subtask WHERE id = ?")
-                .bind(0, id)
-                .map(
-                    (rs, ctx) ->
-                        new SubTask(
-                            id,
-                            rs.getString("title"),
-                            rs.getString("description"),
-                            rs.getString("id")) // Fetch subtasks for this ToDo
-                    )
-                .findOne() // Ensures only one result is returned
-                .orElseThrow(() -> new TodoNotFoundException("Todo with ID " + id + " not found")));
+            handle ->
+                    handle
+                            .createQuery("SELECT * FROM subtask WHERE id = ?")
+                            .bind(0, id)
+                            .map(
+                                    (rs, ctx) ->
+                                            new SubTask(
+                                                    id,
+                                                    rs.getString("title"),
+                                                    rs.getString("description"),
+                                                    rs.getBoolean("completed"),
+                                                    rs.getString("todo_id")))
+                            .findOne()
+                            .orElseThrow(() -> new TodoNotFoundException("Todo with ID " + id + " not found")));
   }
 
-  public SubTask createSubTask(String todoId, String title, String description) {
-
+  public SubTask createSubTask(String todoId, String title, String description, Boolean completed) {
     if (title == null || title.isBlank() || todoId == null || todoId.isBlank()) {
       throw new InvalidInputException("id or title or both empty or null");
     }
     String id = UUID.randomUUID().toString();
     jdbi.withHandle(
-        handle ->
-            handle
-                .createUpdate(
-                    "INSERT INTO subtask (id, todo_id, title, description) VALUES (?, ?, ?, ?)")
-                .bind(0, id)
-                .bind(1, todoId)
-                .bind(2, title)
-                .bind(3, description)
-                .execute());
+            handle ->
+                    handle
+                            .createUpdate(
+                                    "INSERT INTO subtask (id, todo_id, title, description, completed) VALUES (?, ?, ?, ?, ?)")
+                            .bind(0, id)
+                            .bind(1, todoId)
+                            .bind(2, title)
+                            .bind(3, description)
+                            .bind(4, completed != null ? completed : false)
+                            .execute());
     log.info("Created subtasks with id: {} and todoId: {}", id, todoId);
 
-    return new SubTask(id, title, description, todoId); // Return newly created subtask
+    return new SubTask(id, title, description, completed != null ? completed : false, todoId);
   }
 
-  public SubTask updateSubTask(String id, String title, String description) {
-
+  public SubTask updateSubTask(String id, String title, String description, Boolean completed) {
     log.info("Updating subtasks with id: {} and title: {}", id, title);
 
-    if (title == null || title.isBlank() || id == null || id.isBlank()) {
-      throw new InvalidInputException("id or title or both empty or null");
+    if (id == null || id.isBlank()) {
+      throw new InvalidInputException("id is empty or null");
     }
     jdbi.withHandle(
-        handle ->
-            handle
-                .createUpdate("UPDATE subtask SET title = ?, description = ? WHERE id = ?")
-                .bind(0, title)
-                .bind(1, description)
-                .bind(2, id)
-                .execute());
-    return new SubTask(id, description, title, getSubTaskTodoId(id)); // Return updated subtask
+            handle ->
+                    handle
+                            .createUpdate(
+                                    "UPDATE subtask SET title = ?, description = ?, completed = ? WHERE id = ?")
+                            .bind(0, title)
+                            .bind(1, description)
+                            .bind(2, completed)
+                            .bind(3, id)
+                            .execute());
+    return new SubTask(id, title, description, completed, getSubTaskTodoId(id));
   }
 
   public boolean deleteSubTask(String id) {
-
     log.info("Deleting subtasks with id: {}", id);
 
     if (id == null || id.isBlank()) {
       throw new InvalidInputException("id is empty or null");
     }
     return jdbi.withHandle(
-        handle ->
-            handle.createUpdate("DELETE FROM subtask WHERE id = ?").bind(0, id).execute()
-                > 0 // Returns true if at least 1 row was deleted
-        );
+            handle ->
+                    handle.createUpdate("DELETE FROM subtask WHERE id = ?").bind(0, id).execute() > 0);
   }
 
   // Helper methods
@@ -261,17 +265,18 @@ public class ToDoRepository {
     String subTaskId = UUID.randomUUID().toString();
 
     jdbi.withHandle(
-        handle ->
-            handle
-                .createUpdate(
-                    "INSERT INTO subtask (id, title, description, todo_id) VALUES (?, ?, ?, ?)")
-                .bind(0, subTaskId)
-                .bind(1, subTaskInput.getTitle())
-                .bind(2, subTaskInput.getDescription()) // SQLite uses INTEGER for boolean
-                .bind(3, todoId)
-                .execute());
+            handle ->
+                    handle
+                            .createUpdate(
+                                    "INSERT INTO subtask (id, title, description, completed, todo_id) VALUES (?, ?, ?, ?, ?)")
+                            .bind(0, subTaskId)
+                            .bind(1, subTaskInput.title())
+                            .bind(2, subTaskInput.description())
+                            .bind(3, false)
+                            .bind(4, todoId)
+                            .execute());
 
-    return new SubTask(subTaskId, subTaskInput.getTitle(), subTaskInput.getDescription(), todoId);
+    return new SubTask(subTaskId, subTaskInput.title(), subTaskInput.description(), false, todoId);
   }
 
   private String getSubTaskTodoId(String id) {
@@ -279,12 +284,11 @@ public class ToDoRepository {
       throw new InvalidInputException("id is empty or null");
     }
     return jdbi.withHandle(
-        handle ->
-            handle
-                .createQuery("SELECT todo_id FROM subtask WHERE id = ?")
-                .bind(0, id)
-                .mapTo(String.class)
-                .one() // Should return a single result
-        );
+            handle ->
+                    handle
+                            .createQuery("SELECT todo_id FROM subtask WHERE id = ?")
+                            .bind(0, id)
+                            .mapTo(String.class)
+                            .one());
   }
 }
