@@ -42,20 +42,10 @@ This project uses the following key dependencies:
 
 * GraphQL Java: Library to implement GraphQL in Java.
 
-* GraphiQL: Web UI for testing GraphQL queries.** 
-  
-## GraphQL Endpoint
-The GraphQL endpoint is available at:
-
-    GET http://localhost:8080/graphql
-    POST http://localhost:8080/graphql
+* GraphiQL: Web UI for testing GraphQL queries.**
 
 # Postman Validation: 
-* execute a GraphQL query, send a POST request with the query parameter in the body.
-
-**Example query** 
-
-    http://localhost:8080/graphql?query={todos{id,title,description,subtasks{id}}}
+* execute a GraphQL query with uploaded schema.
 
 **Sample Response**
     

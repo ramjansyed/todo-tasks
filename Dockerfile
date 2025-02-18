@@ -25,6 +25,13 @@ COPY --from=build /app/build/libs/ToDoApp-1.0-SNAPSHOT-all.jar /app/app.jar
 # Copy the config.yml file from the resource folder
 COPY src/main/resources/config.yml /app/config.yml
 
+# Ensure data directory exists for SQLite
+RUN mkdir -p /app/data
+
+#Declare /app/data as a volume
+VOLUME ["/app/data"]
+
+
 # Expose the application port
 EXPOSE 8080
 

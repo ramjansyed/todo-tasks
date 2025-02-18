@@ -8,7 +8,7 @@ server:
 
 database:
   driverClass: org.sqlite.JDBC
-  url: jdbc:sqlite:todo.db
+  url: jdbc:sqlite:/app/data/todo.db
   user: ""
   password: ""
   properties:
