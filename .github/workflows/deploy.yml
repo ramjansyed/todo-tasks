@@ -38,4 +38,4 @@ jobs:
 
       - name: Update ECS Service
         run: |
-          aws ecs update-service --cluster todoDevCluster --service todo-service --force-new-deployment
+          aws ecs update-service --cluster todoAppCluster --service my-todo-app-service --force-new-deployment

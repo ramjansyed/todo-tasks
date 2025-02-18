@@ -33,7 +33,7 @@ This project demonstrates how to set up a GraphQL API in a Java Dropwizard appli
 
     Run the Dropwizard application using the Gradle wrapper or Gradle itself.
     ```bash
-   java -jar build/libs/ToDoApp-1.0-SNAPSHOT-all.jar server src/main/resources/config.yml
+   java -jar build/libs/ToDoApp-1.0-SNAPSHOT-all.jar server src/main/resources/config-local.yml
 
 ## Dependencies
 This project uses the following key dependencies:
