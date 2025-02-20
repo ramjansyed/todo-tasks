@@ -4,18 +4,19 @@ import com.todo.models.SubTask;
 import com.todo.models.ToDo;
 import com.todo.repository.ToDoRepository;
 import graphql.kickstart.tools.GraphQLQueryResolver;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.experimental.FieldDefaults;
 
 import java.util.List;
 
+@AllArgsConstructor
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class ToDoQueryResolver implements GraphQLQueryResolver {
-  private final ToDoRepository repository;
-
-  public ToDoQueryResolver(ToDoRepository repository) {
-    this.repository = repository;
-  }
+  ToDoRepository repository;
 
   // Fetches the list of all To-Do objects
-  public List<ToDo> todos() {
+  public List<ToDo> todos() throws Exception {
     return repository.getAllTodos();
   }
 

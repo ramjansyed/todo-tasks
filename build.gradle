@@ -63,6 +63,9 @@ dependencies {
     // Testing dependencies
     testImplementation("io.dropwizard:dropwizard-testing:4.0.12")
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
+    testImplementation 'org.mockito:mockito-core:5.11.0'
+    testImplementation 'org.mockito:mockito-junit-jupiter:5.11.0' // For JUnit 5 support
+
 }
 
 configurations.all {

@@ -16,8 +16,8 @@ import java.util.List;
 public class ToDoMutationResolver implements GraphQLMutationResolver {
   ToDoRepository repository;
 
-  public ToDo createToDo(
-      String title, String description, Boolean completed, List<SubTaskInput> subTaskInputList) {
+  public ToDo createToDo (
+      String title, String description, Boolean completed, List<SubTaskInput> subTaskInputList) throws Exception {
     return repository.createToDo(title, description, completed, subTaskInputList);
   }
 

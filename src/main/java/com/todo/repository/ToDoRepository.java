@@ -6,6 +6,9 @@ import com.todo.models.SubTask;
 import com.todo.models.SubTaskInput;
 import com.todo.models.ToDo;
 import com.todo.utils.InputSanitizer;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
@@ -24,27 +27,24 @@ public class ToDoRepository {
     }
 
     private void setupDatabase() {
-        try {
+        try (Handle handle = jdbi.open()) {
+            log.info("Setting up database tables if they do not exist.");
+            handle.execute(
+                    "CREATE TABLE IF NOT EXISTS todo ("
+                            + "id TEXT PRIMARY KEY, "
+                            + "title TEXT NOT NULL, "
+                            + "description TEXT, "
+                            + "completed BOOLEAN)");
 
-            try (Handle handle = jdbi.open()) {
-                log.info("Setting up database tables if they do not exist.");
-                handle.execute(
-                        "CREATE TABLE IF NOT EXISTS todo ("
-                                + "id TEXT PRIMARY KEY, "
-                                + "title TEXT NOT NULL, "
-                                + "description TEXT, "
-                                + "completed BOOLEAN)");
-
-                handle.execute(
-                        "CREATE TABLE IF NOT EXISTS subtask ("
-                                + "id TEXT PRIMARY KEY, "
-                                + "title TEXT, "
-                                + "description TEXT, "
-                                + "completed BOOLEAN, "
-                                + "todo_id TEXT NOT NULL, "
-                                + "FOREIGN KEY(todo_id) REFERENCES todo(id) ON DELETE CASCADE)");
-                log.info("Database setup completed.");
-            }
+            handle.execute(
+                    "CREATE TABLE IF NOT EXISTS subtask ("
+                            + "id TEXT PRIMARY KEY, "
+                            + "title TEXT, "
+                            + "description TEXT, "
+                            + "completed BOOLEAN, "
+                            + "todo_id TEXT NOT NULL, "
+                            + "FOREIGN KEY(todo_id) REFERENCES todo(id) ON DELETE CASCADE)");
+            log.info("Database setup completed.");
         } catch (Exception e) {
             log.error("Error setting up database: {}", e.getMessage(), e);
         }
@@ -90,10 +90,12 @@ public class ToDoRepository {
     }
 
     public ToDo createToDo(
-            String title, String description, Boolean completed, List<SubTaskInput> subTaskInputList) {
-        if (title == null || title.isBlank()) {
-            throw new InvalidInputException("title is empty or null");
-        }
+            @Valid @NotBlank String title,
+            String description,
+            Boolean completed,
+            List<SubTaskInput> subTaskInputList) {
+
+        System.out.println("Creating todo with title: " + title);
         // Sanitize the input
         String sanitizedTitle = InputSanitizer.sanitize(title);
         String sanitizedDescription = InputSanitizer.sanitize(description);
@@ -124,11 +126,8 @@ public class ToDoRepository {
         return new ToDo(id, title, description, completed != null ? completed : false, createdSubTasks);
     }
 
-    public ToDo updateToDo(String id, String title, String description, Boolean completed) {
+    public ToDo updateToDo(@NotNull @NotBlank String id, String title, String description, Boolean completed) {
 
-        if (id == null || id.isBlank()) {
-            throw new InvalidInputException("id is empty or null");
-        }
         // Sanitize the input
         String sanitizedTitle = InputSanitizer.sanitize(title);
         String sanitizedDescription = InputSanitizer.sanitize(description);
